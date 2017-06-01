@@ -2,9 +2,7 @@ import tensorflow as tf
 import numpy as np
 import os
 
-GENKI4K_DIR = "./genki4k/"
-
-def get_file(dataset_dir):
+def get_files(dataset_dir):
 	data = []
 	labels = []
 
@@ -58,11 +56,13 @@ def get_batch(image,label,w,h,batch_size,capacity):
 ##########################################################
 #simple test for load image & save as tensorflow batch
 ##########################################################
-
+'''
 import matplotlib.pyplot as plt
 
+GENKI4K_DIR = "./genki4k/"
+
 image_list,label_list = get_file(GENKI4K_DIR)
-image_batch,label_batch = get_batch(image_list,label_list,208,208,2,256)
+image_batch,label_batch = get_batch(image_list,label_list,180,180,2,256)
 
 with tf.Session() as sess:
 	i = 0
@@ -76,4 +76,4 @@ with tf.Session() as sess:
 			plt.imshow(img[j,:,:,:])
 			plt.show()
 		i += 1
-
+'''
