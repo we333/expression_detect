@@ -3,24 +3,17 @@ import numpy as np
 import tensorflow as tf
 import load_data
 import model
-
+ 
 import cv2
 
 from PIL import Image
 import matplotlib.pyplot as plt
 
 def get_one_image(train):
-    '''Randomly pick one image from training data
-    Return: ndarray
-    '''
     n = len(train)
-
-    print n
 
     ind = np.random.randint(0, n)
     img_dir = train[ind]
-
-    print img_dir
 
     image = Image.open(img_dir)
     print '---------------------------'
@@ -30,15 +23,11 @@ def get_one_image(train):
     image = np.array(image)
     return image
 
-def evaluate_one_image():
-    '''Test one image against the saved models and parameters
-    '''
+def evaluate_one_image(image_file):
+    image_array = get_one_image([image_file])
     
-    # you need to change the directories to yours.
-    train_dir = './genki4k/'
-    train, train_label = load_data.get_files(train_dir)
-    image_array = get_one_image(train)
-    
+    plt.imshow(image_array)
+
     with tf.Graph().as_default():
         BATCH_SIZE = 1
         N_CLASSES = 2
@@ -58,19 +47,18 @@ def evaluate_one_image():
         saver = tf.train.Saver()
         
         with tf.Session() as sess:
-            
+            print '---------------------------'
             print("Reading checkpoints...")
             ckpt = tf.train.get_checkpoint_state(logs_train_dir)
             if ckpt and ckpt.model_checkpoint_path:
                 global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
                 saver.restore(sess, ckpt.model_checkpoint_path)
+                
                 print('Loading success, global_step is %s' % global_step)
             else:
                 print('No checkpoint file found')
             
             prediction = sess.run(logit, feed_dict={x: image_array})
-
-            print prediction
 
             max_index = np.argmax(prediction)
             if max_index==0:
@@ -80,6 +68,5 @@ def evaluate_one_image():
     return image_array
 
 
-image_array = evaluate_one_image()
+image_array = evaluate_one_image('./test/files/pu_s.jpg')
 
-print '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'

@@ -27,6 +27,8 @@ def get_files(dataset_dir):
 	label_list = list(tmp[:,1])
 	label_list = [int(i) for i in label_list]
 
+	print image_list
+
 	return image_list, label_list
 
 def get_batch(image,label,w,h,batch_size,capacity):
