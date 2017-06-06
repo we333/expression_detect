@@ -1,3 +1,5 @@
+# -- coding: utf-8 --
+
 import os
 import numpy as np
 import tensorflow as tf
@@ -9,31 +11,22 @@ import cv2
 from PIL import Image
 import matplotlib.pyplot as plt
 
-def get_image_from_filelist(train):
-    n = len(train)
+def get_image(filelist):
+    # random choose one image from file_list
+    ind = np.random.randint(0, len(filelist))
+    img_dir = filelist[ind]
 
-    ind = np.random.randint(0, n)
-    img_dir = train[ind]
+    iii = cv2.imread(img_dir)
+ #   iii = cv2.resize(iii,(208,208))
 
     image = Image.open(img_dir)
-    print '---------------------------'
-    
-    iii = cv2.imread(img_dir,1)
-    cv2.imshow('111',iii)
-
-    image = image.resize([208, 208])
-    #cv2.imshow('222',image)
-
+ #   image = image.resize([208, 208])
     image = np.array(image)
 
-    cv2.imshow('222',image)
-    return image
+    return iii
 
 def evaluate_image(image_array):
-
-#    plt.imshow(image_array)
-
-    cv2.imshow('input',image_array)
+    image_array = cv2.resize(image_array,(208,208))
 
     with tf.Graph().as_default():
         BATCH_SIZE = 1
@@ -54,28 +47,30 @@ def evaluate_image(image_array):
         saver = tf.train.Saver()
         
         with tf.Session() as sess:
-            print '---------------------------'
             ckpt = tf.train.get_checkpoint_state(logs_train_dir)
             if ckpt and ckpt.model_checkpoint_path:
                 global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
                 saver.restore(sess, ckpt.model_checkpoint_path) 
-                print('Loading success, global_step is %s' % global_step)
+            #    print('Loading success, global_step is %s' % global_step)
             else:
-                print('No checkpoint file found')
+                pass
+            #    print('No checkpoint file found')
             
             prediction = sess.run(logit, feed_dict={x: image_array})
 
             max_index = np.argmax(prediction)
-            if max_index==0:
-                print('This is smile with possibility %.6f' %prediction[:, 0])
-            else:
-                print('This is non-smile with possibility %.6f' %prediction[:, 1])
-    return image_array
+              # always return smile prediction
+            #if max_index==0:
+            #    print('This is smile with possibility %.6f' %prediction[:, 0])
+            #    return True, prediction[:, 0]
+            #else:
+            #    print('This is non-smile with possibility %.6f' %prediction[:, 1])
+            #    return False, prediction[:,1]
+    return prediction[:,0]
 
-image = get_image_from_filelist(['./test/files/we_s.JPG'])
-image_array = evaluate_image(image)
 
-cv2.imshow('ss',image_array)
+#image = get_image(['./genki4k/files/file0007.jpg'])
+#pred = evaluate_image(image)
 
-cv2.waitKey()
-cv2.destroyAllWindows()
+#cv2.waitKey()
+#cv2.destroyAllWindows()
