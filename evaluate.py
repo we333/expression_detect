@@ -11,22 +11,23 @@ import cv2
 from PIL import Image
 import matplotlib.pyplot as plt
 
+IMG_W = 32
+IMG_H = 32
+
 def get_image(filelist):
     # random choose one image from file_list
     ind = np.random.randint(0, len(filelist))
     img_dir = filelist[ind]
 
     iii = cv2.imread(img_dir)
- #   iii = cv2.resize(iii,(208,208))
 
     image = Image.open(img_dir)
- #   image = image.resize([208, 208])
     image = np.array(image)
 
     return iii
 
 def evaluate_image(image_array):
-    image_array = cv2.resize(image_array,(208,208))
+    image_array = cv2.resize(image_array,(IMG_W,IMG_H))
 
     with tf.Graph().as_default():
         BATCH_SIZE = 1
@@ -34,14 +35,13 @@ def evaluate_image(image_array):
         
         image = tf.cast(image_array, tf.float32)
         image = tf.image.per_image_standardization(image)
-        image = tf.reshape(image, [1, 208, 208, 3])
-        logit = model.inference(image, BATCH_SIZE, N_CLASSES)
+        image = tf.reshape(image, [1, IMG_W, IMG_H, 3])
+        logit = model.vgg13(image, BATCH_SIZE, N_CLASSES)
         
         logit = tf.nn.softmax(logit)
         
-        x = tf.placeholder(tf.float32, shape=[208, 208, 3])
-        
-        # you need to change the directories to yours.
+        x = tf.placeholder(tf.float32, shape=[IMG_W, IMG_H, 3])
+
         logs_train_dir = './logs/train/' 
                        
         saver = tf.train.Saver()
@@ -53,24 +53,16 @@ def evaluate_image(image_array):
                 saver.restore(sess, ckpt.model_checkpoint_path) 
             #    print('Loading success, global_step is %s' % global_step)
             else:
-                pass
-            #    print('No checkpoint file found')
+                print('No checkpoint file found')
             
             prediction = sess.run(logit, feed_dict={x: image_array})
-
             max_index = np.argmax(prediction)
-              # always return smile prediction
-            #if max_index==0:
-            #    print('This is smile with possibility %.6f' %prediction[:, 0])
-            #    return True, prediction[:, 0]
-            #else:
-            #    print('This is non-smile with possibility %.6f' %prediction[:, 1])
-            #    return False, prediction[:,1]
+
     return prediction[:,0]
 
 
-#image = get_image(['./genki4k/files/file0007.jpg'])
-#pred = evaluate_image(image)
-
-#cv2.waitKey()
-#cv2.destroyAllWindows()
+image = get_image(['./test/files/pan_s.JPG'])
+pred = evaluate_image(image)
+print pred
+cv2.waitKey()
+cv2.destroyAllWindows()

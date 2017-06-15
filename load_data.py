@@ -6,16 +6,13 @@ def get_files(dataset_dir):
 	data = []
 	labels = []
 
-# read labels and save
 	with open(dataset_dir+'labels.txt', 'r') as f:
 		for line in filter(None,f):
 			labels.append(line.split(' ')[0])
 
-# read image files and save file name
 	for file in os.listdir(dataset_dir+"files/"):
 		data.append(dataset_dir+"files/"+file)
 
-# create dataset as [data,label]
 	tmp = np.array([data, labels])
 	tmp = tmp.transpose()
 	np.random.shuffle(tmp)
@@ -26,8 +23,6 @@ def get_files(dataset_dir):
 	image_list = list(tmp[:,0])
 	label_list = list(tmp[:,1])
 	label_list = [int(i) for i in label_list]
-
-	print image_list
 
 	return image_list, label_list
 

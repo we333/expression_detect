@@ -7,16 +7,14 @@ import load_data
 import model
 
 N_CLASSES = 2
-IMG_W = 208  # resize the image, if the input image is too large, training will be very slow.
-IMG_H = 208
+IMG_W = 32
+IMG_H = 32
 BATCH_SIZE = 16
 CAPACITY = 2000
-MAX_STEP = 3000 # with current parameters, it is suggested to use MAX_STEP>10k
-learning_rate = 0.0001
+MAX_STEP = 10000
+learning_rate = 0.001
 
 def run_training():
-    
-    # you need to change the directories to yours.
     train_dir = './genki4k/'
     logs_train_dir = './logs/train/'
     
@@ -28,7 +26,7 @@ def run_training():
                                                           IMG_H,
                                                           BATCH_SIZE, 
                                                           CAPACITY)      
-    train_logits = model.inference(train_batch, BATCH_SIZE, N_CLASSES)
+    train_logits = model.vgg13(train_batch, BATCH_SIZE, N_CLASSES)
     train_loss = model.losses(train_logits, train_label_batch)        
     train_op = model.trainning(train_loss, learning_rate)
     train__acc = model.evaluation(train_logits, train_label_batch)
@@ -53,7 +51,7 @@ def run_training():
                 summary_str = sess.run(summary_op)
                 train_writer.add_summary(summary_str, step)
             
-            if step % 2000 == 0 or (step + 1) == MAX_STEP:
+            if step % 100 == 0 or (step + 1) == MAX_STEP:
                 checkpoint_path = os.path.join(logs_train_dir, 'model.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
                 
