@@ -7,8 +7,8 @@ import load_data
 import model
 
 N_CLASSES = 2
-IMG_W = 32
-IMG_H = 32
+IMG_W = 208
+IMG_H = 208
 BATCH_SIZE = 16
 CAPACITY = 2000
 MAX_STEP = 10000

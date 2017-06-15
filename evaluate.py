@@ -11,8 +11,8 @@ import cv2
 from PIL import Image
 import matplotlib.pyplot as plt
 
-IMG_W = 32
-IMG_H = 32
+IMG_W = 208
+IMG_H = 208
 
 def get_image(filelist):
     # random choose one image from file_list
